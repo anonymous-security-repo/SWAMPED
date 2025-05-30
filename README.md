@@ -1,4 +1,4 @@
-# WADE (WebAsssembly Anti-evasion Detection Evaluation)
+# SWAMPED (Systematic WebAssembly Module Perturbation Evaluation of Detectors)
 
 # Project Overview
 
