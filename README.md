@@ -1,24 +1,100 @@
 # SWAMPED (Systematic WebAssembly Module Perturbation Evaluation of Detectors)
 
-# Project Overview
+SWAMPED systematically applies **22 types of binary-level transformations** while preserving the behavior of the original binary.
 
-This repository contains tools for parsing and applying perturbation methods to WebAssembly binary files.
+This framework is modular, extensible, and requires only standard Python dependencies and the WABT toolkit.
 
-## Folder Structure
+## Repository Structure
 
-### `wasmParser`
-- **`parser.py`**: Parses `.wast` files into individual sections.
-- **`sectionStructure.py`**: Defines the structure and content of each section for recording purposes.
+```bash
+SWAMPED/
+├── samples/                      # Input/output WASM binaries & text format files
+├── strategies/
+│   ├── data/                     # Templates and artifacts for perturbation
+│   ├── code_perturbation.py     # Logic-level (instruction) perturbation
+│   ├── structural_perturbation.py  # Structural (non-code) perturbation
+│   └── state.py                 # Opcode list and distribution handler
+├── wasmParser/
+│   ├── parser.py                # Regex-based parser and perturbed wasm/wast writer
+│   └── sectionStructure.py      # Section class definitions
+└── perturb.ipynb                # Perturbation test script
 
-### `strategies`
-- **`section_entry.py`**: Contains strategies related to section entries.
-- **`function_code.py`**: Implements strategies for function code manipulations.
+```
 
-### `perturb.ipynb`
-- Jupyter notebook that imports modules from the `strategies` folder.
-- Includes test code to demonstrate and validate implemented perturbation methods.
+---
 
-## Usage
-1. Use the `wasmParser` module to parse `.wast` files into sections.
-2. Apply perturbation methods using `strategies` modules in the `perturb.ipynb` notebook.
-3. Run the test code in `perturb.ipynb` to validate your modifications.
+## `samples/`
+
+This directory contains `.wasm` and `.wast` files used for input/output testing.
+
+> 🔧 When converting .wasm → .wast, always use:
+> 
+
+```bash
+wasm2wat sample.wasm --generate-names -o sample.wast
+
+```
+
+---
+
+## `wasmParser/`
+
+### `parser.py`
+
+- Uses regex to parse WebAssembly `.wast` text format
+- Includes:
+    - Section-level parsing
+    - Utility to save perturbed '.wast' back to `.wasm`
+
+### `sectionStructure.py`
+
+- Defines each WebAssembly section as a Python class
+- Provides structure for clean parsing & manipulation
+
+---
+
+## `strategies/`
+
+Perturbation logic is implemented here as independent functions.
+
+### `code_perturbation.py`
+
+🔧 Code-level transformation:
+
+- Applies logic-preserving rewrites to **instruction sequences**
+- Focused on semantic equivalence while changing code layout
+
+### `structural_perturbation.py`
+
+🏗 Structural binary transformation:
+
+- Modifies non-code components (e.g., types, function defs)
+- Does **not** alter instruction logic
+
+### `state.py`
+
+- Stores opcode lists used for instruction-level perturbation
+- Contains `getDist()` function to sample based on beta distribution
+
+### `data/`
+
+Artifacts used during perturbation:
+
+- Function template snippets
+- Additional section entries used to inject/replace content
+
+---
+
+## `perturb.ipynb` – Testing Notebook
+
+Run perturbation examples from here.
+
+Requires [`wabt`](https://github.com/WebAssembly/wabt) installed for:
+
+```bash
+wasm2wat   # with --generate-names
+wat2wasm
+
+```
+
+---
